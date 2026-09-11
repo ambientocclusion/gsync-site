@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GSync — resumable Google Drive folder sync for macOS</title>
+<meta name="description" content="A personal macOS app that mirrors Google Drive folders locally, with byte-level resume and configurable concurrency.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #1c1c1e;
+    --muted: #6b6b70;
+    --rule: #e3e3e6;
+    --card: #f7f7f8;
+    --accent: #0b62d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151517;
+      --fg: #ececef;
+      --muted: #9a9aa0;
+      --rule: #2c2c30;
+      --card: #1e1e21;
+      --accent: #6aa9ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 72px; }
+  h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .tag { color: var(--muted); font-size: 1.05rem; margin: 0 0 36px; }
+  h2 { font-size: 1.15rem; margin: 38px 0 10px; letter-spacing: -0.01em; }
+  p { margin: 0 0 14px; }
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin-bottom: 8px; }
+  a { color: var(--accent); }
+  code {
+    font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--card);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 0 0 14px;
+  }
+  footer {
+    margin-top: 48px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  footer a { margin-right: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>GSync</h1>
+  <p class="tag">A personal macOS app that mirrors Google Drive folders onto your Mac, with downloads that actually resume.</p>
+
+  <h2>Why it exists</h2>
+  <p>
+    The official Google Drive desktop app always runs about ten transfers at once, and when the
+    network drops mid-file it starts that file again from the beginning. On a large file over a
+    flaky connection, that can mean never finishing at all.
+  </p>
+
+  <h2>What it does differently</h2>
+  <ul>
+    <li><strong>Byte-level resume.</strong> A download continues from the last byte written to disk, across network drops and across quitting the app. GSync records how far it got only after the bytes are flushed to disk, then asks Google for the rest with an HTTP <code>Range</code> request and verifies the finished file against Drive's MD5 checksum.</li>
+    <li><strong>Concurrency you choose.</strong> Anywhere from one to thirty-two simultaneous downloads, adjustable while transfers are running.</li>
+    <li><strong>A daily transfer budget.</strong> Transfers pause automatically once a limit you set is reached in a rolling 24-hour window.</li>
+    <li><strong>Renames stay renames.</strong> Renaming or moving a folder in Drive renames it locally instead of downloading everything again.</li>
+    <li><strong>Careful with your files.</strong> Deletions go to the Trash, never straight to oblivion, and a large deletion asks before it runs. Files you edited locally are protected by default.</li>
+  </ul>
+
+  <h2>How it works</h2>
+  <p>
+    GSync talks directly to the Google Drive API from your Mac. There is no GSync server, no account
+    to create, and no third-party service in the path. It signs in with an OAuth client that
+    <em>you</em> create in your own Google Cloud project, using read-only access to Drive.
+  </p>
+
+  <div class="card">
+    <strong>Read-only by design.</strong> GSync requests the <code>drive.readonly</code> scope. It can
+    read your Drive, and it cannot modify or delete anything in it. The current version mirrors in one
+    direction only: Drive to your Mac.
+  </div>
+
+  <h2>Requirements</h2>
+  <ul>
+    <li>macOS 15 or later</li>
+    <li>Your own Google Cloud OAuth client for a desktop app (free; the app walks you through it)</li>
+  </ul>
+
+  <h2>Privacy</h2>
+  <p>
+    Your files, your file names, and your sign-in tokens stay on your Mac. Nothing is collected,
+    and nothing is sent anywhere except to Google's own APIs.
+    Read the <a href="privacy.html">privacy policy</a> for the specifics.
+  </p>
+
+  <footer>
+    <a href="privacy.html">Privacy policy</a>
+    <a href="mailto:ambientocclusion9@gmail.com">Contact</a>
+  </footer>
+
+</div>
+</body>
+</html>
